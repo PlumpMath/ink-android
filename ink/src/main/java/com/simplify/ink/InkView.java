@@ -344,7 +344,7 @@ public class InkView extends View
     public void setColor(int color)
     {
         strokeColor = color;
-        if(eraserOn) mPaint.setColor(color);
+        if(!eraserOn) mPaint.setColor(color);
     }
 
     /**

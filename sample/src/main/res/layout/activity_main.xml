@@ -10,38 +10,75 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginTop="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="15dp"
         android:gravity="center_horizontal">
 
-        <com.simplify.ink.InkView
-            android:layout_gravity="center_vertical"
-            android:background="#DDDDDD"
-            android:id="@+id/ink"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:inkFlags="interpolation|responsiveWeight"/>
-        <LinearLayout
-            android:layout_gravity="center"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:orientation="horizontal">
-            <TextView
+            android:layout_height="match_parent">
+            <com.simplify.ink.InkView
+                android:id="@+id/ink"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent" />
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/please_sign_above"
-                android:textColor="@android:color/black"
-                android:textStyle="bold"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/toggle_eraser"
-                android:layout_marginLeft="10dp"
-                android:onClick="onButtonClick"/>
-        </LinearLayout>
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_alignParentBottom="true">
+                <GridView
+                    android:layout_margin="1dp"
+                    android:id="@+id/ColorSelector"
+                    android:layout_width="240dp"
+                    android:layout_height="180dp"
+                    android:numColumns="auto_fit"
+                    android:verticalSpacing="4dp"
+                    android:horizontalSpacing="4dp"
+                    android:columnWidth="35dp"
+                    android:stretchMode="spacingWidthUniform"
+                    android:visibility="gone"
+                    android:background="#ffffff" />
+
+                <LinearLayout
+                    android:id="@+id/maintab"
+                    android:orientation="horizontal"
+                    android:background="#ffffffff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true">
+                    <LinearLayout
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:id="@+id/lineBtnBackground"
+                        android:padding="8dp"
+                        android:background="#A35F3A">
+                        <Button
+                            android:id="@+id/lineBtn"
+                            android:onClick="lineBtnClick"
+                            android:background="@drawable/ic_create_black_24dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/eraserBtnBackground">
+                        <Button
+                            android:onClick="eraserBtnClick"
+                            android:id="@+id/eraserBtn"
+                            android:background="@drawable/eraser"
+                            android:layout_width="48dp"
+                            android:layout_height="48dp" />
+                    </LinearLayout>
+                    <Button
+                        android:onClick="ClearBtnClick"
+                        android:id="@+id/clearbtn"
+                        android:background="@drawable/rubbish"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>
