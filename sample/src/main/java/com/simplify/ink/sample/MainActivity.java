@@ -5,12 +5,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.simplify.ink.InkView;
 
 public class MainActivity extends Activity
 {
     InkView mInkView;
+    boolean eraserOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -72,5 +74,11 @@ public class MainActivity extends Activity
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onButtonClick(View view) {
+        if (eraserOn) mInkView.setEraserOff();
+        else mInkView.setEraserOn();
+        eraserOn = !eraserOn;
     }
 }

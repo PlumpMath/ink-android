@@ -5,6 +5,8 @@ import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -59,6 +61,7 @@ public class InkView extends View
     private static final int DEFAULT_FLAGS = FLAG_INTERPOLATION | FLAG_RESPONSIVE_WIDTH;
 
     // settings
+    private boolean eraserOn;
     private int mFlags;
     private float mMaxStrokeWidth;
     private float mMinStrokeWidth;
@@ -75,6 +78,7 @@ public class InkView extends View
     private Paint mPaint;
     private RectF mDirty;
     private ArrayList<InkListener> mListeners = new ArrayList<InkListener>();
+    public int strokeColor;
 
     // debug
     private boolean mHasDebugLayer = false;
@@ -141,6 +145,7 @@ public class InkView extends View
         mDebugLinePaint.setAntiAlias(true);
         mDebugLinePaint.setStyle(Paint.Style.STROKE);
         mDebugLinePaint.setColor(getContext().getResources().getColor(android.R.color.darker_gray));
+        eraserOn = false;
 
         // apply default settings
         setColor(getResources().getColor(android.R.color.black));
@@ -229,6 +234,20 @@ public class InkView extends View
      * Sets the feature flags for the view. This will overwrite any previously set flag
      * @param flags A bit mask of one or more flags (ie. FLAG_INTERPOLATION | FLAG_RESPONSIVE_WIDTH)
      */
+
+    public void setEraserOn()
+    {
+        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        setColor(android.R.color.transparent);
+        eraserOn = true;
+        }
+    public void setEraserOff()
+    {
+        mPaint.setXfermode(null);
+        eraserOn = false;
+        setColor(strokeColor);
+    }
+
     public void setFlags(int flags)
     {
         mFlags = flags;
@@ -324,7 +343,8 @@ public class InkView extends View
      */
     public void setColor(int color)
     {
-        mPaint.setColor(color);
+        strokeColor = color;
+        if(eraserOn) mPaint.setColor(color);
     }
 
     /**
@@ -382,6 +402,7 @@ public class InkView extends View
         // init bitmap cache
         mBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+
 
         // init debug bitmap cache
         mDebugBitmap = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
