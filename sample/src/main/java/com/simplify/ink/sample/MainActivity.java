@@ -23,6 +23,8 @@ import com.simplify.ink.InkView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.channels.Selector;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 public class MainActivity extends Activity
@@ -31,7 +33,7 @@ public class MainActivity extends Activity
     GridView colorSelector, thicknessSelector;
     ColorListAdapter cla;
     ThicknessListAdapter tla;
-    LinearLayout drawBg, eraserBg, thicknessBg;
+    LinearLayout drawBg, eraserBg, thicknessBg, lockBg;
 
     private int bgColor, thicknessRatio=6, currentThickness;
     private String[] ColorIds = {"#ffff0000", "#ffff5e00", "#ffffbb00", "#ff1ddb16", "#ff0100ff", "#ff000000", "#fff15f5f", "#fff29661", "#fff2cb61", "#ff86e57f", "#ff6b66ff", "#ffffffff",
@@ -55,6 +57,7 @@ public class MainActivity extends Activity
         drawBg = (LinearLayout) findViewById(R.id.lineBtnBackground);
         eraserBg = (LinearLayout) findViewById(R.id.eraserBtnBackground);
         thicknessBg = (LinearLayout) findViewById(R.id.thicknessBtnBackground);
+        lockBg = (LinearLayout) findViewById(R.id.lockBtnBackground);
         bgColor = Color.argb(255,163,95,58);
 
         colorSelector = (GridView)findViewById(R.id.colorSelector);
@@ -81,8 +84,8 @@ public class MainActivity extends Activity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 currentThickness = i;
-                ink.setMinStrokeWidth(Thicknesses[i]*thicknessRatio/2);
-                ink.setMaxStrokeWidth(Thicknesses[i]*thicknessRatio);
+                ink.setMinStrokeWidth(Thicknesses[i]*thicknessRatio/4);
+                ink.setMaxStrokeWidth(Thicknesses[i]*thicknessRatio/2);
                 thicknessSelector.setVisibility(View.GONE);
             }
         });
@@ -114,8 +117,19 @@ public class MainActivity extends Activity
         eraserBg.setBackgroundColor(0);
         thicknessBg.setBackgroundColor(0);
     }
+    public void lockBtnClick(View view) {
+        if (ink.getLockState()) {
+            ink.setLockOff();
+            lockBg.setBackgroundColor(0);
+        }
+        else
+        {
+            ink.setLockOn();
+            lockBg.setBackgroundColor(bgColor);
+        }
+    }
 
-    public void ClearBtnClick(View view) {
+    public void clearBtnClick(View view) {
         ink.clear();
     }
     private Bitmap overlay(Bitmap bmp1, Bitmap bmp2) {
@@ -124,5 +138,43 @@ public class MainActivity extends Activity
         canvas.drawBitmap(bmp1, new Matrix(), null);
         canvas.drawBitmap(bmp2, new Matrix(), null);
         return bmOverlay;
+    }
+
+    public void saveBtnClick(View view) {
+        SaveImage(ink.getBitmap(Color.parseColor("#FFFFFF")));
+    }
+    private void SaveImage(android.graphics.Bitmap finalBitmap) {
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/Pictures");
+        myDir.mkdirs();
+        Random generator = new Random();
+        Integer n = generator.nextInt(1000);
+        String fname = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss_").format(new Date())+n+".png";
+        File file = new File (myDir, fname);
+        if (file.exists ()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+            out.flush();
+            out.close();
+            Toast.makeText(this, "File saved to: "+fname, Toast.LENGTH_LONG).show();
+            new SingleMediaScanner(this, file);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 }

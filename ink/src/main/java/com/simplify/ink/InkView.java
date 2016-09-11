@@ -61,6 +61,7 @@ public class InkView extends View
     private static final int DEFAULT_FLAGS = FLAG_INTERPOLATION | FLAG_RESPONSIVE_WIDTH;
 
     // settings
+    private boolean lockOn;
     private boolean eraserOn;
     private int mFlags;
     private float mMaxStrokeWidth;
@@ -145,14 +146,14 @@ public class InkView extends View
         mDebugLinePaint.setAntiAlias(true);
         mDebugLinePaint.setStyle(Paint.Style.STROKE);
         mDebugLinePaint.setColor(getContext().getResources().getColor(android.R.color.darker_gray));
-        eraserOn = false;
 
         // apply default settings
         setColor(getResources().getColor(android.R.color.black));
         setMaxStrokeWidth(DEFAULT_MAX_STROKE_WIDTH);
         setMinStrokeWidth(DEFAULT_MIN_STROKE_WIDTH);
         setSmoothingRatio(DEFAULT_SMOOTHING_RATIO);
-
+        eraserOn = false;
+        lockOn = false;
         // init dirty rect
         mDirty = new RectF();
     }
@@ -173,6 +174,9 @@ public class InkView extends View
     @Override
     public boolean onTouchEvent(MotionEvent e)
     {
+        // ignore if locked
+        if (lockOn) return true;
+
         int action = e.getAction();
 
         // on down, initialize stroke point
@@ -235,14 +239,24 @@ public class InkView extends View
      * @param flags A bit mask of one or more flags (ie. FLAG_INTERPOLATION | FLAG_RESPONSIVE_WIDTH)
      */
 
-    public void setEraserOn()
-    {
+    public Boolean getLockState() {
+        return lockOn;
+    }
+    public void setLockOn() {
+        lockOn = true;
+    }
+    public void setLockOff() {
+        lockOn = false;
+    }
+    public Boolean getEraserState() {
+        return eraserOn;
+    }
+    public void setEraserOn() {
         mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        setColor(android.R.color.transparent);
+        mPaint.setColor(getResources().getColor(android.R.color.transparent));
         eraserOn = true;
-        }
-    public void setEraserOff()
-    {
+    }
+    public void setEraserOff() {
         mPaint.setXfermode(null);
         eraserOn = false;
         setColor(strokeColor);
@@ -344,7 +358,8 @@ public class InkView extends View
     public void setColor(int color)
     {
         strokeColor = color;
-        if(!eraserOn) mPaint.setColor(color);
+        mPaint.setColor(color);
+        mPaint.setAlpha(255);
     }
 
     /**
