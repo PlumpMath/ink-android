@@ -5,7 +5,7 @@ public class ColorItem {
     public String getColorString() {
         return ColorString;
     }
-    public String setColorString(String colorString) {
-        return ColorString = colorString;
+    public void setColorString(String colorString) {
+        ColorString = colorString;
     }
 }

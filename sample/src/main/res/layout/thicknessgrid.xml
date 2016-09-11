@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="35dp"
+    android:gravity="center"
+    android:background="#fff3e0"
+    android:layout_height="35dp">
+    <View
+        android:id="@+id/penCircle"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/circle" />
+</LinearLayout>

@@ -22,25 +22,30 @@ import com.simplify.ink.InkView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.channels.Selector;
 import java.util.Random;
 
 public class MainActivity extends Activity
 {
     InkView ink;
-    GridView colorSelector;
-    ColorListAdapter cla = new ColorListAdapter();
-    LinearLayout drawBg, eraserBg;
+    GridView colorSelector, thicknessSelector;
+    ColorListAdapter cla;
+    ThicknessListAdapter tla;
+    LinearLayout drawBg, eraserBg, thicknessBg;
 
-    private int bgColor;
-
+    private int bgColor, thicknessRatio=6, currentThickness;
     private String[] ColorIds = {"#ffff0000", "#ffff5e00", "#ffffbb00", "#ff1ddb16", "#ff0100ff", "#ff000000", "#fff15f5f", "#fff29661", "#fff2cb61", "#ff86e57f", "#ff6b66ff", "#ffffffff",
             "#ffcc3d3d", "#ffcc723d", "#ffcca63d", "#ff47c83e", "#ff4641d9", "#ff8c8c8c", "#ff980000", "#ff993800", "#ff997000", "#ff2f9d27", "#ff050099", "#ff5d5d5d",
             "#ff670000", "#ff662500", "#ff664b00", "#ff22741c", "#ff030066", "#ff353535"};
+    private float[] Thicknesses = {1.5f,3f,4.5f,6f,7.5f,9f};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tla = new ThicknessListAdapter();
+        cla = new ColorListAdapter();
 
         ink = (InkView) findViewById(R.id.ink);
         ink.setColor(Color.argb(255,0,0,0));
@@ -49,30 +54,47 @@ public class MainActivity extends Activity
 
         drawBg = (LinearLayout) findViewById(R.id.lineBtnBackground);
         eraserBg = (LinearLayout) findViewById(R.id.eraserBtnBackground);
+        thicknessBg = (LinearLayout) findViewById(R.id.thicknessBtnBackground);
         bgColor = Color.argb(255,163,95,58);
 
-        colorSelector = (GridView)findViewById(R.id.ColorSelector);
+        colorSelector = (GridView)findViewById(R.id.colorSelector);
         colorSelector.setAdapter(cla);
+
+        thicknessSelector = (GridView)findViewById(R.id.thicknessSelector);
+        thicknessSelector.setAdapter(tla);
 
         for(String str : ColorIds)
             cla.addItem(str);
+
+        for(float thick : Thicknesses)
+            tla.addItem(thick*thicknessRatio);
 
         colorSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ink.setColor(Color.parseColor(ColorIds[position]));
-                ink.setMinStrokeWidth(1.5f);
-                ink.setMaxStrokeWidth(6f);
                 colorSelector.setVisibility(View.GONE);
+            }
+        });
+
+        thicknessSelector.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                currentThickness = i;
+                ink.setMinStrokeWidth(Thicknesses[i]*thicknessRatio/2);
+                ink.setMaxStrokeWidth(Thicknesses[i]*thicknessRatio);
+                thicknessSelector.setVisibility(View.GONE);
             }
         });
     }
 
     public void lineBtnClick(View view) {
         colorSelector.setVisibility(View.VISIBLE);
+        thicknessSelector.setVisibility(View.GONE);
         ink.setEraserOff();
         drawBg.setBackgroundColor(bgColor);
         eraserBg.setBackgroundColor(0);
+        thicknessBg.setBackgroundColor(0);
     }
 
     public void eraserBtnClick(View view) {
@@ -81,6 +103,16 @@ public class MainActivity extends Activity
         ink.setEraserOn();
         drawBg.setBackgroundColor(0);
         eraserBg.setBackgroundColor(bgColor);
+        thicknessBg.setBackgroundColor(0);
+    }
+
+    public void thicknessBtnClick(View view) {
+        colorSelector.setVisibility(View.GONE);
+        thicknessSelector.setVisibility(View.VISIBLE);
+        ink.setEraserOff();
+        drawBg.setBackgroundColor(bgColor);
+        eraserBg.setBackgroundColor(0);
+        thicknessBg.setBackgroundColor(0);
     }
 
     public void ClearBtnClick(View view) {
